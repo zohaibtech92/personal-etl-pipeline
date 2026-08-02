@@ -1,0 +1,20 @@
+/* https://api.frankfurter.dev/v1/latest?base=USD */
+{
+  "base": "USD",
+  "date": "2026-07-31",
+  "rates": {
+    "AUD": 1.4249,
+    "BRL": 5.0583,
+    "CAD": 1.4041,
+    "CHF": 0.8101,
+    "CNY": 6.7513,
+    "...": "..."
+  }
+}
+
+
+
+
+
+
+
