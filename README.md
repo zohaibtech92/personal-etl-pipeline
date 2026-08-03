@@ -17,7 +17,7 @@ Build a simple daily pipeline that:
 
 ## Status
 
-🚧 In progress — currently on Step 1 (API research)
+🚧 In progress — currently on Step 3 (Transform)
 
 ## Progress Log
 
@@ -34,7 +34,15 @@ Build a simple daily pipeline that:
 - Manually tested the API via browser/curl to confirm the response structure
 - Identified the fields I actually need: date, and the exchange rate for the currency pair I'm tracking
 
-### Step 2: Extract (coming next)
+### Step 2: Extract ✅
+- Built `src/extract.py`, which handles only one job: calling the Frankfurter API and returning the raw response
+- Used the `requests` library to send a GET request to the exchange rate endpoint
+- Added status code checking — if the API call succeeds (status 200), the raw JSON is returned/printed; 
+  if not, a clear error message is shown instead of letting the script fail silently
+- Verified the script works consistently across multiple runs
+- Deliberately tested a broken URL to confirm error handling works correctly before reverting it back
+- Kept this file focused purely on extraction — no cleaning or storage logic lives here, to keep each 
+  pipeline stage isolated and easy to debug independently
 ### Step 3: Transform (coming next)
 ### Step 4: Load (coming next)
 ### Step 5: Combine into a pipeline (coming next)
