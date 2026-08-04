@@ -17,7 +17,7 @@ Build a simple daily pipeline that:
 
 ## Status
 
-🚧 In progress — currently on Step 3 (Transform)
+🚧 In progress — currently on Step 4 (Load)
 
 ## Progress Log
 
@@ -43,7 +43,19 @@ Build a simple daily pipeline that:
 - Deliberately tested a broken URL to confirm error handling works correctly before reverting it back
 - Kept this file focused purely on extraction — no cleaning or storage logic lives here, to keep each 
   pipeline stage isolated and easy to debug independently
-### Step 3: Transform (coming next)
+### Step 3: Transform ✅
+- Built `src/transform.py`, which handles only one job: turning raw API data into a clean, structured row
+- Wrote a `transform_data` function that:
+  - Extracts just the fields needed (date and the specific currency exchange rate) from the raw nested JSON
+  - Adds a `pulled_at` timestamp to record exactly when each data point was captured — important for 
+    building an accurate historical record over time
+  - Returns a single clean row as a Pandas DataFrame
+- Verified column data types explicitly — confirmed the date is stored as an actual date type (not plain 
+  text) and the rate is stored as a number (not a string), to avoid silent bugs later in storage or charting
+- Tested the function against real, live data pulled from `extract.py`, not just a static sample, to confirm 
+  it behaves correctly end-to-end
+- Kept this file focused purely on transformation — it does not call the API itself or write to any 
+  database, keeping each pipeline stage independent and easy to debug
 ### Step 4: Load (coming next)
 ### Step 5: Combine into a pipeline (coming next)
 ### Step 6: Schedule with cron (coming next)
