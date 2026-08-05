@@ -15,7 +15,7 @@ logging.basicConfig(
 )
 
 def run_pipeline():
-  logging.info("Pipeline started.")
+  logging.info("Pipeline started...!")
 
   try:
     raw_data = extract_data()
