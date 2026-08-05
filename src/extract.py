@@ -8,5 +8,5 @@ def extract_data():
         data = response.json()
         return data
     else:
-        print(f"Something went wrong: {response.status_code}")
-        return None
+        raise Exception (f"Something went wrong: {response.status_code}")
+        
