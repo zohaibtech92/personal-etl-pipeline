@@ -17,7 +17,7 @@ Build a simple daily pipeline that:
 
 ## Status
 
-🚧 In progress — currently on Step 4 (Load)
+🚧 In progress — currently on Step 6 (Schedule with cron)
 
 ## Progress Log
 
@@ -56,8 +56,35 @@ Build a simple daily pipeline that:
   it behaves correctly end-to-end
 - Kept this file focused purely on transformation — it does not call the API itself or write to any 
   database, keeping each pipeline stage independent and easy to debug
-### Step 4: Load (coming next)
-### Step 5: Combine into a pipeline (coming next)
+### Step 4: Load ✅
+- Built `src/load.py`, which handles only one job: saving clean data permanently into a local SQLite database
+- Wrote a `create_table()` function that creates the `exchange_rates` table only if it doesn't already exist, 
+  making it safe to run on every pipeline execution without wiping existing data
+- Added a `UNIQUE(date)` constraint on the table to prevent accidental duplicate rows if the pipeline 
+  ever runs more than once on the same day
+- Wrote an `insert_data()` function that saves a clean row into the table, using parameterized queries 
+  (`?` placeholders) instead of directly inserting values into SQL strings, to avoid SQL injection risks
+- Hit and fixed a real bug: SQLite doesn't support Pandas' `Timestamp` type directly. Fixed by explicitly 
+  converting `date` and `pulled_at` to plain strings, and `rate` to a plain float, right before inserting — 
+  a good example of translating between two tools' different type systems at the boundary where they connect
+- Verified duplicate protection works: running the script twice in a row correctly skips the second insert 
+  instead of crashing
+- Manually inspected the database file to confirm data was actually persisted, not just printed
+
+### Step 5: Combine Into a Pipeline ✅
+- Built `src/pipeline.py`, which ties together Extract, Transform, and Load into a single automated sequence
+- Refactored `extract.py` and `transform.py` to `return` their results instead of just printing, so their 
+  functions could be reused and chained together by the pipeline
+- Removed the database, since I forgot to check "PKR" is present in the API response — the API changed its 
+  base currency and rate key, causing a `KeyError`. This surfaced the importance of not assuming an external 
+  API's response structure stays constant, and validating keys before accessing them
+- Added logging (instead of print statements) that writes timestamped entries to `data/pipeline.log`, 
+  recording whether each stage (extract, transform, load) succeeded or failed
+- Wrapped the full pipeline in a `try/except` block so failures are logged clearly with a reason, instead of 
+  the script crashing with no record of what happened — important since this pipeline is meant to run 
+  unattended on a schedule
+- Tested both success and failure paths: confirmed a full successful run logs correctly and inserts a new 
+  row, and confirmed a deliberately broken step logs a clear error message instead of failing silently
 ### Step 6: Schedule with cron (coming next)
 ### Step 7: Visualize trend (coming next)
 
