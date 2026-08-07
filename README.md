@@ -102,10 +102,6 @@ Build a simple daily pipeline that:
 - Updated `load.py` to log the actual inserted exchange rate (not just "load succeeded") so `pipeline.log` 
   gives a genuine at-a-glance summary of what data was captured on each run, without needing to open 
   the database separately
-- Updated `.gitignore` to exclude generated files (`data/exchange_rates.db`, `data/pipeline.log`), since 
-  these are reproducible outputs rather than source code — anyone running the pipeline themselves will 
-  generate their own fresh copies
-
 **Known limitation:** since this runs on a personal laptop rather than an always-on server, the 
 scheduled job only runs if the machine is awake at the scheduled time. In a production environment, 
 this would typically run on a cloud server or use a managed scheduler (e.g., Airflow) to guarantee 
