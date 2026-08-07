@@ -3,7 +3,7 @@ from datetime import datetime
 
 def transform_data(raw_data):
     date = raw_data["date"]
-    rate = raw_data["rates"]["EUR"]
+    rate = raw_data["rates"]["INR"]
     pulled_at = datetime.now()
 
     row = {

@@ -15,7 +15,7 @@ logging.basicConfig(
 )
 
 def run_pipeline():
-  logging.info("Pipeline started...!")
+  logging.info("Pipeline started.")
 
   try:
     raw_data = extract_data()
@@ -28,7 +28,7 @@ def run_pipeline():
     insert_data(clean_df)
     logging.info("Load step succeeded.")
 
-    logging.info("Pipeline finish successfully.")
+    logging.info("Pipeline finished successfully.")
 
   except Exception as e:
     logging.error(f"Pipeline failed: {e}")

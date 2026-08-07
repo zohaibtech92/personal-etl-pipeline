@@ -1,5 +1,6 @@
 import sqlite3
 import os
+import logging
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "exchange_rates.db")
 
@@ -37,7 +38,7 @@ def insert_data(df):
       """, (date_str, rate_value, pulled_at_str))
     
     conn.commit()
-    print(f"Inserted row for {row['date']}: rate = {row['rate']}")
+    logging.info(f"Inserted row for {date_str}: rate = {rate_value}")
 
   except sqlite3.IntegrityError:
     print(f"Row for {row['date']} already exists — skipping duplicate insert.")
