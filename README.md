@@ -17,7 +17,7 @@ Build a simple daily pipeline that:
 
 ## Status
 
-🚧 In progress — currently on Step 6 (Schedule with cron)
+🚧 In progress — currently on Step 7 (Visualize trend)
 
 ## Progress Log
 
@@ -85,7 +85,31 @@ Build a simple daily pipeline that:
   unattended on a schedule
 - Tested both success and failure paths: confirmed a full successful run logs correctly and inserts a new 
   row, and confirmed a deliberately broken step logs a clear error message instead of failing silently
-### Step 6: Schedule with cron (coming next)
+### Step 6: Schedule with Cron ✅
+- Set up a `cron` job to run `pipeline.py` automatically once daily, without any manual action
+- **Bug — macOS cron permissions:** After confirming the pipeline ran cleanly and scheduling it via 
+  `crontab -e`, scheduled runs weren't executing at all — no entries appeared in `pipeline.log`, and 
+  macOS's system log confirmed cron never even attempted to fire the job. Root cause was macOS's Full 
+  Disk Access security restriction, which blocks background processes like cron from running until 
+  explicitly granted permission in System Settings → Privacy & Security. Granted access and restarted 
+  the machine to apply it, which resolved the issue.
+- Also hit and resolved a separate issue where `crontab -e` repeatedly failed with a `bad minute` error 
+  despite the cron line appearing correct — worked around it by writing the cron line to a plain text 
+  file with `echo` and loading it directly via `crontab /path/to/file`, which bypassed whatever was 
+  going wrong in the interactive editor
+- Verified success by checking `data/pipeline.log` for automatic, timestamped entries that appeared 
+  without any manual script execution
+- Updated `load.py` to log the actual inserted exchange rate (not just "load succeeded") so `pipeline.log` 
+  gives a genuine at-a-glance summary of what data was captured on each run, without needing to open 
+  the database separately
+- Updated `.gitignore` to exclude generated files (`data/exchange_rates.db`, `data/pipeline.log`), since 
+  these are reproducible outputs rather than source code — anyone running the pipeline themselves will 
+  generate their own fresh copies
+
+**Known limitation:** since this runs on a personal laptop rather than an always-on server, the 
+scheduled job only runs if the machine is awake at the scheduled time. In a production environment, 
+this would typically run on a cloud server or use a managed scheduler (e.g., Airflow) to guarantee 
+consistent execution.
 ### Step 7: Visualize trend (coming next)
 
 ## Tech Stack
