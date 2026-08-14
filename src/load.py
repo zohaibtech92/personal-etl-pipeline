@@ -12,9 +12,10 @@ def create_table():
         CREATE TABLE IF NOT EXISTS exchange_rates (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             date TEXT NOT NULL,
+            currency TEXT NOT NULL,
             rate REAL NOT NULL,
             pulled_at TEXT NOT NULL,
-            UNIQUE(date)
+            UNIQUE(date, currency)
         )
     """)
   
@@ -24,25 +25,20 @@ def create_table():
 def insert_data(df):
   conn = sqlite3.connect(DB_PATH)
   cursor = conn.cursor()
-
   row = df.iloc[0]
-
-  date_str = row["date"].strftime("%Y-%m-%d")       
-  pulled_at_str = str(row["pulled_at"])              
+  date_str = row["date"].strftime("%Y-%m-%d")
+  pulled_at_str = str(row["pulled_at"])
   rate_value = float(row["rate"])
-
+  currency = "INR"
   try:
     cursor.execute("""
-                    INSERT INTO exchange_rates(date, rate, pulled_at)
-                    VALUES(?, ?, ?)
-      """, (date_str, rate_value, pulled_at_str))
-    
+                    INSERT INTO exchange_rates (date, currency, rate, pulled_at)
+                    VALUES (?, ?, ?, ?)
+      """, (date_str, currency, rate_value, pulled_at_str))
+
     conn.commit()
-    logging.info(f"Inserted row for {date_str}: rate = {rate_value}")
-
+    logging.info(f"Inserted row for {date_str} ({currency}): rate = {rate_value}")
   except sqlite3.IntegrityError:
-    print(f"Row for {row['date']} already exists — skipping duplicate insert.")
-
+    logging.info(f"Row for {date_str} ({currency}) already exists — skipping duplicate insert.")
   finally:
     conn.close()
-
