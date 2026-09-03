@@ -106,7 +106,20 @@ Build a simple daily pipeline that:
 scheduled job only runs if the machine is awake at the scheduled time. In a production environment, 
 this would typically run on a cloud server or use a managed scheduler (e.g., Airflow) to guarantee 
 consistent execution.
-### Step 7: Visualize trend (coming next)
+### Step 7: Visualize Trend ✅
+- Built `src/visualize.py`, which handles only one job: reading all stored rows and plotting the trend
+- Query explicitly filters `WHERE currency = 'INR'`, as a safeguard against ever accidentally mixing 
+  different currencies into the same chart again (see Step 6's currency-column fix)
+- Used Matplotlib to generate a labeled line chart (date on x-axis, exchange rate on y-axis), with markers 
+  at each data point and saved it as a PNG file
+- Verified the chart's values matched the raw database rows before trusting the output
+- Excluded the live, auto-regenerating chart (`data/trend_chart.png`) from version control, since it 
+  changes every time the script runs — kept one deliberate snapshot (`docs/sample_trend_chart.png`) 
+  instead, specifically for showcasing in this README
+
+## Sample Output
+
+![Exchange rate trend chart](docs/sample_trend_chart.png)
 
 ## Tech Stack
 
