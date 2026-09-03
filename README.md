@@ -17,10 +17,10 @@ Build a simple daily pipeline that:
 
 ## Status
 
-🚧 In progress — currently on Step 7 (Visualize trend)
+
 
 ## Progress Log
-
+- Completed✅
 ### Step 0: Environment Setup ✅
 - Created project folder and Python virtual environment (`venv`)
 - Installed core libraries: `requests`, `pandas`, `matplotlib`
