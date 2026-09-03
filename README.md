@@ -16,11 +16,8 @@ Build a simple daily pipeline that:
 5. Visualizes the trend over time
 
 ## Status
-
-
-
-## Progress Log
-- Completed✅
+  Completed✅
+  
 ### Step 0: Environment Setup ✅
 - Created project folder and Python virtual environment (`venv`)
 - Installed core libraries: `requests`, `pandas`, `matplotlib`
