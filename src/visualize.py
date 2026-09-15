@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import os
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "exchange_rates.db")
-OUTPUT_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "trend_chart.png")
+OUTPUT_PATH = os.path.join(os.path.dirname(__file__), "..", "static", "trend_chart.png")
 
 def load_all_data():
     conn = sqlite3.connect(DB_PATH)
