@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Exchange Rate Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>USD to INR Exchange Rate Tracker</h1>
+
+    {% if latest %}
+    <div class="latest">
+        <h2>Latest Rate</h2>
+        <p><strong>{{ latest["rate"] }}</strong> on {{ latest["date"] }}</p>
+    </div>
+    {% else %}
+    <p>No data yet — run the pipeline first.</p>
+    {% endif %}
+
+    <h2>Trend</h2>
+    <img src="{{ url_for('static', filename='trend_chart.png') }}" alt="Exchange rate trend chart">
+
+    <h2>History</h2>
+    <table>
+        <tr>
+            <th>Date</th>
+            <th>Currency</th>
+            <th>Rate</th>
+            <th>Pulled At</th>
+        </tr>
+        {% for row in rows %}
+        <tr>
+            <td>{{ row["date"] }}</td>
+            <td>{{ row["currency"] }}</td>
+            <td>{{ row["rate"] }}</td>
+            <td>{{ row["pulled_at"] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
