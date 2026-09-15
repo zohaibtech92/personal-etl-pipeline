@@ -11,3 +11,5 @@ logs/
 *.db
 
 data/trend_chart.png
+
+static/trend_chart.png
