@@ -11,8 +11,8 @@ sys.path.insert(0, str(SRC_DIR))
 
 @dag(
     dag_id="exchange_rate_pipeline",
-    schedule=None,  # manual trigger only, for now
-    start_date=pendulum.datetime(2026, 10, 1, tz="UTC"),
+    schedule="0 21 * * 1-5",  # weekdays at 21:00 Pakistan time
+    start_date=pendulum.datetime(2026, 10, 1, tz="Asia/Karachi"),
     catchup=False,
     tags=["etl", "exchange-rate"],
 )
