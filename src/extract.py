@@ -2,7 +2,7 @@ import requests
 
 def extract_data():
     url = 'https://api.frankfurter.dev/v1/latest?base=USD'
-    response = requests.get(url)
+    response = requests.get(url, timeout=30)
     
     if response.status_code == 200:
         data = response.json()
