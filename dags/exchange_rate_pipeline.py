@@ -1,8 +1,9 @@
+import logging
 import sys
 from pathlib import Path
 
 import pendulum
-from airflow.sdk import dag, task
+from airflow.sdk import dag, task, get_current_context
 
 # Let the DAG import your existing code from the src/ folder
 SRC_DIR = Path(__file__).resolve().parents[1] / "src"
@@ -21,7 +22,12 @@ def exchange_rate_pipeline():
     @task
     def extract_rates():
         from extract import extract_data
-        return extract_data()
+
+        # Ask the API for the rate of the day this run is for
+        logical_date = get_current_context().get("logical_date")
+        date_str = logical_date.strftime("%Y-%m-%d") if logical_date else None
+        logging.info(f"Fetching rate for {date_str or 'latest'}")
+        return extract_data(date_str)
 
     @task
     def transform_rates(raw_data):

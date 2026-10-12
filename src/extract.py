@@ -1,12 +1,15 @@
 import requests
 
-def extract_data():
-    url = 'https://api.frankfurter.dev/v1/latest?base=USD'
+
+def extract_data(date=None):
+    """Fetch USD exchange rates from the Frankfurter API.
+
+    date: "YYYY-MM-DD" for a specific day, or None for the latest rates.
+    """
+    when = date if date else "latest"
+    url = f"https://api.frankfurter.dev/v1/{when}?base=USD"
     response = requests.get(url, timeout=30)
-    
+
     if response.status_code == 200:
-        data = response.json()
-        return data
-    else:
-        raise Exception (f"Something went wrong: {response.status_code}")
-        
+        return response.json()
+    raise Exception(f"Something went wrong: {response.status_code}")
