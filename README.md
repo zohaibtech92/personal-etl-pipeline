@@ -162,6 +162,31 @@ visible and recoverable with a backfill. A production setup would run Airflow as
 
 ![Exchange rate trend chart](docs/sample_trend_chart.png)
 
+## Running the Airflow version
+
+Airflow lives in its own virtual environment, outside this repo, so its dependencies do not clash with
+`requirements.txt`. This is the setup I used (WSL Ubuntu, Python 3.12 created with uv):
+
+    uv venv --seed --python 3.12 ~/airflow-venv
+    source ~/airflow-venv/bin/activate
+
+    AIRFLOW_VERSION=3.3.2
+    PYTHON_VERSION="$(python -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')"
+    CONSTRAINT_URL="https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt"
+    pip install "apache-airflow==${AIRFLOW_VERSION}" --constraint "${CONSTRAINT_URL}"
+    pip install pandas --constraint "${CONSTRAINT_URL}"
+
+Airflow writes `~/airflow/airflow.cfg` the first time you run an `airflow` command (for example
+`airflow version`). In that file, set `dags_folder` to this repo's `dags/` folder and `load_examples = False`.
+Do this before the first start, or run `airflow db reset` afterwards, as I had to. Then start everything with:
+
+    airflow standalone
+
+The UI is at http://localhost:8080. The scheduler only fires while Airflow is running, so to recover days
+it missed, backfill a date range (`--dry-run` shows which runs would be created without creating them):
+
+    airflow backfill create --dag-id exchange_rate_pipeline --from-date 2026-10-01 --to-date 2026-10-09 --max-active-runs 1 --dry-run
+
 ## Tech Stack
 
 - Python 3
