@@ -114,6 +114,50 @@ consistent execution.
   changes every time the script runs — kept one deliberate snapshot (`docs/sample_trend_chart.png`) 
   instead, specifically for showcasing in this README
 
+### Step 8: Orchestrate with Apache Airflow ✅
+- Replaced the cron scheduling and the hand-written log file with an Apache Airflow DAG
+  (`dags/exchange_rate_pipeline.py`). The ETL logic in `src/` is reused as-is, apart from two small edits:
+  a 30-second request timeout, and an optional `date` argument on `extract_data()`. The original
+  `pipeline.py` still works on its own.
+- The DAG has three tasks, one per stage (`extract_rates` → `transform_rates` → `load_rates`), written with
+  Airflow's TaskFlow API (`@dag` / `@task`)
+- Schedule: weekdays at 21:00 Asia/Karachi (after the ECB publishes that day's reference rates), `catchup=False`
+- Each run asks the API for the rate of its own logical date, so a backfill fetches real historical rates
+  instead of re-fetching today's
+- Each task retries up to 3 times, one minute apart. Per-task logs and run history in the Airflow UI
+  replace `data/pipeline.log`
+- Setup: Airflow 3.3.2 on WSL Ubuntu, in its own virtual environment outside the repo, built on Python 3.12
+  (via uv) and installed with the official constraints file. My system Python is 3.14, which I avoided
+  for Airflow as a precaution against dependency problems. `dags_folder` in `airflow.cfg` points at this
+  repo's `dags/` folder
+
+**What I verified**
+- Triggered the DAG manually and by schedule: all three tasks succeed and the load step inserts the row
+- Broke the API hostname on purpose: `extract_rates` went into `up_for_retry`, and after I restored the URL
+  the next retry succeeded without any manual re-run
+- My database had no rows for 1, 2, 6, 7 and 8 October 2026 (the old scheduled job had stopped running).
+  `airflow backfill create` for 2026-10-01 to 2026-10-09 created six runs and filled all five gaps. The row
+  that already existed was not duplicated, because the load step is idempotent (`UNIQUE(date, currency)`)
+
+**Bugs and surprises**
+- **Design catch — swallowed exceptions:** `run_pipeline()` catches every exception and only logs it.
+  Airflow judges a task by whether it raises, so a dead API would have shown as a green run and never
+  retried. The DAG therefore calls the stage functions directly instead of `run_pipeline()`.
+- **Bug — `airflow dags list` crashed after I turned off the example DAGs:** Airflow had already stored the
+  examples in its metadata database during the first run, and one of them needed a plugin that was no
+  longer loaded. `airflow db reset` fixed it; nothing of mine was in that database.
+- **Bug — copying the project from Windows into WSL:** git reported every file as modified and
+  `README.md`, `Procfile` and `docs/` as missing. The "modified" noise was CRLF vs LF line endings. I
+  re-copied the three missing items and set `core.autocrlf input`. The Windows `venv` was useless in
+  Linux and had to be deleted.
+- **Surprise — a stray scheduled run:** I changed the schedule and the timezone in two separate edits,
+  and Airflow most likely parsed the file in between, creating one scheduled run with a 21:00 UTC logical
+  date. It was harmless because the load step skips duplicates.
+
+**Known limitation:** Airflow's scheduler only fires while it is running (`airflow standalone` in a
+terminal on a personal laptop), so a run can still be missed. What changed is that a missed day is now
+visible and recoverable with a backfill. A production setup would run Airflow as an always-on service.
+
 ## Sample Output
 
 ![Exchange rate trend chart](docs/sample_trend_chart.png)
@@ -124,7 +168,8 @@ consistent execution.
 - Pandas
 - SQLite
 - Frankfurter API (exchange rates)
-- Matplotlib (planned, for visualization)
+- Matplotlib (trend chart)
+- Apache Airflow 3 (orchestration)
 
 ## Why This Project
 
