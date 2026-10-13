@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 import sys
 from pathlib import Path
 
@@ -15,6 +16,7 @@ sys.path.insert(0, str(SRC_DIR))
     schedule="0 21 * * 1-5",  # weekdays at 21:00 Pakistan time
     start_date=pendulum.datetime(2026, 10, 1, tz="Asia/Karachi"),
     catchup=False,
+    default_args={"retries": 3, "retry_delay": timedelta(minutes=1)},
     tags=["etl", "exchange-rate"],
 )
 def exchange_rate_pipeline():
