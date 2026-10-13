@@ -135,7 +135,7 @@ consistent execution.
 - Triggered the DAG manually and by schedule: all three tasks succeed and the load step inserts the row
 - Broke the API hostname on purpose: `extract_rates` went into `up_for_retry`, and after I restored the URL
   the next retry succeeded without any manual re-run
-- My database had no rows for 1, 2, 6, 7 and 8 October 2026 (the old scheduled job had stopped running).
+- My database had no rows for 1, 2, 6, 7 and 8 October 2026.
   `airflow backfill create` for 2026-10-01 to 2026-10-09 created six runs and filled all five gaps. The row
   that already existed was not duplicated, because the load step is idempotent (`UNIQUE(date, currency)`)
 
